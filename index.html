@@ -1,0 +1,89 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <style>
+            html, body {
+                margin: 0px;
+                padding: 0px;
+                width: 100%;
+                height: 100%;
+            }
+            
+            #menu {
+                position: absolute;
+                bottom: 0;
+                right: 0;
+                width: 250px;
+                height: 50px;
+                background-color: rgba(0,0,0,0.7);
+                color: #FFF;
+                font-family: sans-serif;
+                padding-left: 5px;
+                padding-top: 5px;
+            }
+
+            iframe {
+                width: 100%;
+                height: 100%;
+                z-index: 10;
+                margin: 0px;
+                padding: 0px;
+                border: 0px;
+            }
+        </style>
+        <script>
+            var iframes;
+            var index = 0;
+            var duration = 5000;
+            var interval;
+
+            /*document.onreadystatechange = function() {
+                if (document.readyState == "complete") {
+                    onload();
+                }
+            };*/
+
+            function swapIframes() {
+                if (iframes.length == 0) { return; }
+                iframes[index].setAttribute("style", "display: none");
+                if (++index >= iframes.length) { index = 0; }
+                iframes[index].setAttribute("style", "display: initial");
+            }
+
+            function getIframes() {
+                iframes = document.getElementsByTagName("iframe");
+            }
+
+            function startInterval() {
+                clearInterval(interval);
+                swapIframes();
+                interval = setInterval(swapIframes, duration);
+            }
+
+            function addIframe() {
+                var site = window.prompt("Entrez l'URL du site (URL COMPLÈTE):");
+                if (site == "") { return; }
+                var new_iframe = document.createElement("iframe");
+                new_iframe.setAttribute("src", site);
+                document.body.appendChild(new_iframe);
+                getIframes();
+                startInterval();
+            }
+
+            function changeDuration() {
+                duration = window.prompt("Entrez la durée:");
+                startInterval();
+            }
+            
+        </script>
+    </head>
+
+    <body>
+        <div id="menu">
+            <i>Alternate.</i><br />
+            <button onclick="addIframe()">Ajouter un site</button>
+            <button onclick-"changeDuration()">Changer la durée</button>
+        </div>
+    </body>
+</html>
