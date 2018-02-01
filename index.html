@@ -1,6 +1,18 @@
 <!DOCTYPE HTML>
 <html>
+    <!--
+        =====================================================================
+        Alternate: a webpage that alternates between different websites.
+        Aub Guillemette, January 2018
+        ---------------------------------------------------------------------
+        Known issues:
+          - Sometimes iframes refuse to load the webpage because of
+            - CORS
+            - the protocol specified in the URL isn't the same as this page's
+        =====================================================================
+    -->
     <head>
+        <title>Alternate</title>
         <meta charset="utf-8">
         <style>
             html, body {
@@ -37,16 +49,33 @@
             }
         </style>
         <script>
+            document.onreadystatechange = function() {
+                if (document.readyState == "complete") {
+                    setLanguage();
+                }
+            };
+
+            //Q: Why do you want this page to be able to be in French?
+            //A: Because vive le QC that's why
+            var language = {
+                fr: {
+                    add_site: "Ajouter un site",
+                    change_duration: "Changer le délai",
+                    enter_url_site: "Entrez l'URL du site (URL COMPLÈTE):",
+                    enter_duration: "Entrez la durée du délai entre le changement des pages:"
+                },
+                en: {
+                    add_site: "Add a website",
+                    change_duration: "Change delay",
+                    enter_url_site: "Enter the website URL (FULL-LENGTH URL):",
+                    enter_duration: "Enter the delay between webpage switch:"
+                }
+            }
+
             var iframes;
             var index = 0;
             var duration = 5000;
             var interval;
-
-            /*document.onreadystatechange = function() {
-                if (document.readyState == "complete") {
-                    onload();
-                }
-            };*/
 
             function swapIframes() {
                 if (iframes.length == 0) { return; }
@@ -66,7 +95,7 @@
             }
 
             function addIframe() {
-                var site = window.prompt("Entrez l'URL du site (URL COMPLÈTE):");
+                var site = window.prompt(text.enter_url_site);
                 if (site == "") { return; }
                 var new_iframe = document.createElement("iframe");
                 new_iframe.setAttribute("src", site);
@@ -76,8 +105,18 @@
             }
 
             function changeDuration() {
-                duration = window.prompt("Entrez la durée:");
+                duration = window.prompt(text.enter_duration);
                 startInterval();
+            }
+
+            function setLanguage() {
+                const text = language.fr;
+
+                var button_add_site = document.getElementById("btn_add_site");
+                btn_add_site.textContent = text.add_site;
+
+                var btn_change_duration = document.getElementById("btn_change_duration");
+                btn_change_duration.textContent = text.change_duration;
             }
             
         </script>
@@ -86,8 +125,8 @@
     <body>
         <div id="menu">
             <i>Alternate.</i><br />
-            <button onclick="addIframe()">Ajouter un site</button>
-            <button onclick="changeDuration()">Changer la durée</button>
+            <button id="btn_add_site" onclick="addIframe()">add_site</button>
+            <button id="btn_change_duration" onclick="changeDuration()">change_duration</button>
         </div>
     </body>
 </html>
