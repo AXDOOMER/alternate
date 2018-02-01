@@ -96,7 +96,7 @@
 
             function addIframe() {
                 var site = window.prompt(text.enter_url_site);
-                if (site == "") { return; }
+                if (site == "" || site == undefined) { return; }
                 var new_iframe = document.createElement("iframe");
                 new_iframe.setAttribute("src", site);
                 document.body.appendChild(new_iframe);
@@ -105,6 +105,8 @@
             }
 
             function changeDuration() {
+                var new_duration = window.prompt(text.enter_duration);
+                if (new_duration == "" || new_duration == undefined) { return; }
                 duration = window.prompt(text.enter_duration);
                 startInterval();
             }
