@@ -1,250 +1,251 @@
 <!DOCTYPE HTML>
 <html>
-    <!--
-        =====================================================================
-        Alternate: a webpage that alternates between different websites.
-        Aub Guillemette, January 2018
-        ---------------------------------------------------------------------
-        Known issues:
-          - Sometimes iframes refuse to load the webpage because of
-            - CORS
-            - the protocol specified in the URL isn't the same as this page's
-        =====================================================================
-    -->
-    <head>
-        <title>Alternate</title>
-        <meta charset="utf-8">
-        <style>
-            html, body {
-                margin: 0px;
-                padding: 0px;
-                width: 100%;
-                height: 100%;
-            }
-            
-            #menu {
-                position: absolute;
-                bottom: 0;
-                right: 0;
-                width: 450px;
-                height: 50px;
-                background-color: rgba(0,0,0,0.7);
-                color: #FFF;
-                font-family: sans-serif;
-                padding-left: 5px;
-                padding-top: 5px;
-                z-index: 50;
-            }
+	<!--
+		=====================================================================
+		Alternate: a webpage that alternates between different websites.
+		Aub Guillemette, January 2018
+		---------------------------------------------------------------------
+		Known issues:
+		  - Sometimes iframes refuse to load the webpage because of
+		  - CORS
+		  - the protocol specified in the URL isn't the same as this page's
+		=====================================================================
+	-->
+	<head>
+		<title>Alternate</title>
+		<meta charset="utf-8">
+		<style>
+			html, body {
+				margin: 0px;
+				padding: 0px;
+				width: 100%;
+				height: 100%;
+			}
+			
+			#menu {
+				position: absolute;
+				bottom: 0;
+				right: 0;
+				width: 450px;
+				height: 50px;
+				background-color: rgba(0,0,0,0.7);
+				color: #FFF;
+				font-family: sans-serif;
+				padding-left: 5px;
+				padding-top: 5px;
+				z-index: 50;
+			}
 
-            #prompt_bg {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                z-index: 70;
-                background-color: rgba(0,0,0,0.7);
-                color: #FFF;
-                font-family: sans-serif;
-                display: none;
-            }
+			#prompt_bg {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				z-index: 70;
+				background-color: rgba(0,0,0,0.7);
+				color: #FFF;
+				font-family: sans-serif;
+				display: none;
+			}
 
-            #prompt_container {
-                display: table-cell;
-                vertical-align: middle;
-            }
+			#prompt_container {
+				display: table-cell;
+				vertical-align: middle;
+			}
 
-            #prompt {
-                margin-left: auto;
-                margin-right: auto;
-                width: 375px;
-                background-color: #000;
-                padding: 20px;
-            }
+			#prompt {
+				margin-left: auto;
+				margin-right: auto;
+				width: 375px;
+				background-color: #000;
+				padding: 20px;
+			}
 
-            #prompt_text {
-                background-color:#444;
-                color: #FFF;
-                border: none;
-                margin: 10px 0px;
-                width: 100%;
-            }
+			#prompt_text {
+				background-color:#444;
+				color: #FFF;
+				border: none;
+				margin: 10px 0px;
+				width: 100%;
+			}
 
-            #prompt_buttons_container {
-                text-align: right;
-            }
+			#prompt_buttons_container {
+				text-align: right;
+			}
 
-            .prompt_buttons {
-                display: inline-block;
-                width: 20%;
-                background-color: #444;
-                text-align: center;
-                padding: 5px;
-                font-size: 75%;
-            }
+			.prompt_buttons {
+				display: inline-block;
+				width: 20%;
+				background-color: #444;
+				text-align: center;
+				padding: 5px;
+				font-size: 75%;
+			}
 
-            .prompt_buttons, .prompt_buttons:hover, .prompt_buttons:visited, .prompt_buttons:active {
-                text-decoration: none;
-                color: #FFF;
-            }
+			.prompt_buttons, .prompt_buttons:hover, .prompt_buttons:visited, .prompt_buttons:active {
+				text-decoration: none;
+				color: #FFF;
+			}
 
-            .prompt_buttons:hover {
-                background-color: #555;
-            }
+			.prompt_buttons:hover {
+				background-color: #555;
+			}
 
-            iframe {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                z-index: 10;
-                margin: 0px;
-                padding: 0px;
-                border: 0px;
-            }
-        </style>
-        <script>
-            document.onreadystatechange = function() {
-                if (document.readyState == "complete") {
-                    setLanguage();
-                    document.getElementById("prompt_text").addEventListener("keyup", handle_keyboard);
-                }
-            };
+			iframe {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				z-index: 10;
+				margin: 0px;
+				padding: 0px;
+				border: 0px;
+			}
+		</style>
+		<script>
+			//Let's start by defining some stuff
+			var iframes;
+			var index = 0;
+			var duration = 5000;
+			var interval;
+			var text;
+			
+			//Support for multiple languages
+			//Q: Why do you want this page to be able to be in French?
+			//A: Because vive le QC that's why
+			var language = {
+				fr: {
+					add_site: "Ajouter un site",
+					change_duration: "Changer le délai",
+					enter_url_site: "Entrez l'URL du site (URL COMPLÈTE):",
+					enter_duration: "Entrez la durée du délai entre le changement des pages:"
+				},
+				en: {
+					add_site: "Add a website",
+					change_duration: "Change delay",
+					enter_url_site: "Enter the website URL (FULL-LENGTH URL):",
+					enter_duration: "Enter the delay between webpage switch:"
+				}
+			}
 
-            //Q: Why do you want this page to be able to be in French?
-            //A: Because vive le QC that's why
-            var language = {
-                fr: {
-                    add_site: "Ajouter un site",
-                    change_duration: "Changer le délai",
-                    enter_url_site: "Entrez l'URL du site (URL COMPLÈTE):",
-                    enter_duration: "Entrez la durée du délai entre le changement des pages:"
-                },
-                en: {
-                    add_site: "Add a website",
-                    change_duration: "Change delay",
-                    enter_url_site: "Enter the website URL (FULL-LENGTH URL):",
-                    enter_duration: "Enter the delay between webpage switch:"
-                }
-            }
+			//Prompt "system"
+			var prompt = {
+				show: function(msg_text, callback) {
+					if (typeof(callback) === "function") { this.callback = callback; }
+					
+					var prompt_title = document.getElementById("prompt_title");
+					prompt_title.innerText = msg_text;
+					
+					var prompt_bg = document.getElementById("prompt_bg");
+					prompt_bg.setAttribute("style", "display: table");
+					
+					var prompt_text = document.getElementById("prompt_text");
+					prompt_text.focus();
+					
+				},
+				close: function() {
+					var prompt_bg = document.getElementById("prompt_bg");
+					prompt_bg.setAttribute("style", "display: none");
 
-            var prompt = {
-                show: function(msg_text, callback) {
-                    if (typeof(callback) === "function") { this.callback = callback; }
-                    
-                    var prompt_title = document.getElementById("prompt_title");
-                    prompt_title.innerText = msg_text;
-                    
-                    var prompt_bg = document.getElementById("prompt_bg");
-                    prompt_bg.setAttribute("style", "display: table");
-                    
-                    var prompt_text = document.getElementById("prompt_text");
-                    prompt_text.focus();
-                    
-                },
-                close: function() {
-                    var prompt_bg = document.getElementById("prompt_bg");
-                    prompt_bg.setAttribute("style", "display: none");
+					var prompt_text = document.getElementById("prompt_text");
+					prompt_text.value = "";
 
-                    var prompt_text = document.getElementById("prompt_text");
-                    prompt_text.value = "";
+					this.callback = undefined;
+				},
+				process: function() {
+					var prompt_text = document.getElementById("prompt_text");
+					this.callback(prompt_text.value);
+					this.close();
+				},
+				callback: undefined
+			}
 
-                    this.callback = undefined;
-                },
-                process: function() {
-                    var prompt_text = document.getElementById("prompt_text");
-                    this.callback(prompt_text.value);
-                    this.close();
-                },
-                callback: undefined
-            }
+			//Do stuff on load
+			document.onreadystatechange = function() {
+				if (document.readyState == "complete") {
+					setLanguage();
+					document.getElementById("prompt_text").addEventListener("keyup", handle_keyboard);
+				}
+			};
 
-            function handle_keyboard(event) {
-                event.preventDefault();
-                switch (event.keyCode) {
-                    case 13:
-                        document.getElementById("prompt_ok").click();
-                        break;
-                    case 27:
-                        document.getElementById("prompt_cancel").click();
-                }
-            }
+			function setLanguage() {
+				text = language.fr;
 
-            var iframes;
-            var index = 0;
-            var duration = 5000;
-            var interval;
-            var text;
+				var button_add_site = document.getElementById("btn_add_site");
+				btn_add_site.textContent = text.add_site;
 
-            function swapIframes() {
-                if (iframes.length == 0) { return; }
-                iframes[index].setAttribute("style", "z-index: -10");
-                if (++index >= iframes.length) { index = 0; }
-                iframes[index].setAttribute("style", "z-index: 10");
-            }
+				var btn_change_duration = document.getElementById("btn_change_duration");
+				btn_change_duration.textContent = text.change_duration;
+			}
 
-            function getIframes() {
-                iframes = document.getElementsByTagName("iframe");
-            }
+			function handle_keyboard(event) {
+				event.preventDefault();
+				switch (event.keyCode) {
+					case 13:
+						document.getElementById("prompt_ok").click();
+						break;
+					case 27:
+						document.getElementById("prompt_cancel").click();
+				}
+			}
 
-            function startInterval() {
-                clearInterval(interval);
-                swapIframes();
-                interval = setInterval(swapIframes, duration);
-            }
+			function swapIframes() {
+				if (iframes.length == 0) { return; }
+				iframes[index].setAttribute("style", "z-index: -10");
+				if (++index >= iframes.length) { index = 0; }
+				iframes[index].setAttribute("style", "z-index: 10");
+			}
+
+			function getIframes() {
+				iframes = document.getElementsByTagName("iframe");
+			}
+
+			function startInterval() {
+				clearInterval(interval);
+				swapIframes();
+				interval = setInterval(swapIframes, duration);
+			}
 
 
-            function addIframe_prompt() { prompt.show(text.enter_url_site, function(value) { addIframe(value); }); }
-            function changeDuration_prompt() { prompt.show(text.change_duration, function(value) { changeDuration(value); }); }
+			function addIframe_prompt() { prompt.show(text.enter_url_site, function(value) { addIframe(value); }); }
+			function addIframe(site) {
+				if (site == "" || site == undefined) { return; }
+				var new_iframe = document.createElement("iframe");
+				new_iframe.setAttribute("src", site);
+				document.body.appendChild(new_iframe);
+				getIframes();
+				startInterval();
+			}
 
-            function addIframe(site) {
-                if (site == "" || site == undefined) { return; }
-                var new_iframe = document.createElement("iframe");
-                new_iframe.setAttribute("src", site);
-                document.body.appendChild(new_iframe);
-                getIframes();
-                startInterval();
-            }
+			function changeDuration_prompt() { prompt.show(text.change_duration, function(value) { changeDuration(value); }); }
+			function changeDuration(new_duration) {
+				if (new_duration == "" || new_duration == undefined) { return; }
+				duration = window.prompt(text.enter_duration);
+				startInterval();
+			}
+			
+		</script>
+	</head>
 
-            function changeDuration(new_duration) {
-                if (new_duration == "" || new_duration == undefined) { return; }
-                duration = window.prompt(text.enter_duration);
-                startInterval();
-            }
-
-            function setLanguage() {
-                text = language.fr;
-
-                var button_add_site = document.getElementById("btn_add_site");
-                btn_add_site.textContent = text.add_site;
-
-                var btn_change_duration = document.getElementById("btn_change_duration");
-                btn_change_duration.textContent = text.change_duration;
-            }
-            
-        </script>
-    </head>
-
-    <body>
-        <div id="menu">
-            <i>Alternate.</i><br />
-            <button id="btn_add_site" onclick="addIframe_prompt()">add_site</button>
-            <button id="btn_change_duration" onclick="changeDuration_prompt()">change_duration</button>
-        </div>
-        <div id="prompt_bg">
-            <div id="prompt_container">
-                <div id="prompt">
-                    <span id="prompt_title">Text</span><br />
-                    <input id="prompt_text" type="text" /><br />
-                    <div id="prompt_buttons_container">
-                        <a href="#" id="prompt_ok" onclick="prompt.process()" class="prompt_buttons">OK</a>
-                        <a href="#" id="prompt_cancel" onclick="prompt.close()" class="prompt_buttons">Cancel</a>
-                    </div>
-                    <!--<button onclick="processPrompt()">Ok</button>
-                    <button onclick="cancelPrompt()">Cancel</button>-->
-                </div>
-            </div>
-        </div>
-    </body>
+	<body>
+		<div id="menu">
+			<i>Alternate.</i><br />
+			<button id="btn_add_site" onclick="addIframe_prompt()">add_site</button>
+			<button id="btn_change_duration" onclick="changeDuration_prompt()">change_duration</button>
+		</div>
+		<div id="prompt_bg">
+			<div id="prompt_container">
+				<div id="prompt">
+					<span id="prompt_title">Text</span><br />
+					<input id="prompt_text" type="text" /><br />
+					<div id="prompt_buttons_container">
+						<a href="#" id="prompt_ok" onclick="prompt.process()" class="prompt_buttons">OK</a>
+						<a href="#" id="prompt_cancel" onclick="prompt.close()" class="prompt_buttons">Cancel</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
 </html>
