@@ -92,6 +92,15 @@
 				background-color: #555;
 			}
 
+			.hide {
+				opacity: 0;
+				transition: all ease 0.8s;
+			}
+
+			.hide:hover {
+				opacity: 1;
+			}
+
 			iframe {
 				position: absolute;
 				top: 0;
@@ -217,6 +226,10 @@
 				document.body.appendChild(new_iframe);
 				getIframes();
 				startInterval();
+
+				// Hide the menu once a site has been added for aesthetics and avoid screen burn-in
+				var menu_panel = document.getElementById("menu");
+				menu_panel.classList.add("hide");;
 			}
 
 			function changeDuration_prompt() { prompt.show(text.change_duration, function(value) { changeDuration(value); }); }
