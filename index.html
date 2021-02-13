@@ -232,7 +232,7 @@
 				menu_panel.classList.add("hide");;
 			}
 
-			function changeDuration_prompt() { prompt.show(text.change_duration, function(value) { changeDuration(value); }); }
+			function changeDuration_prompt() { prompt.show(text.enter_duration, function(value) { changeDuration(value); }); }
 			function changeDuration(new_duration) {
 				if (new_duration == "" || new_duration == undefined) { return; }
 				duration = new_duration;
