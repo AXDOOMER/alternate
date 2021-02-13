@@ -234,7 +234,7 @@
 
 			function changeDuration_prompt() { prompt.show(text.enter_duration, function(value) { changeDuration(value); }); }
 			function changeDuration(new_duration) {
-				if (new_duration == "" || new_duration == undefined) { return; }
+				if (new_duration == "" || new_duration == undefined || isNaN(new_duration)) { return; }
 				duration = new_duration * 1000;
 				startInterval();
 			}
