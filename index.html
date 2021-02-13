@@ -235,7 +235,7 @@
 			function changeDuration_prompt() { prompt.show(text.change_duration, function(value) { changeDuration(value); }); }
 			function changeDuration(new_duration) {
 				if (new_duration == "" || new_duration == undefined) { return; }
-				duration = window.prompt(text.enter_duration);
+				duration = new_duration;
 				startInterval();
 			}
 			
