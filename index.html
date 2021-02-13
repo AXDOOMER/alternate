@@ -129,13 +129,13 @@
 					add_site: "Ajouter un site",
 					change_duration: "Changer le délai",
 					enter_url_site: "Entrez l'URL du site (URL COMPLÈTE):",
-					enter_duration: "Entrez la durée du délai entre le changement des pages:"
+					enter_duration: "Entrez la durée (en secondes) du délai entre le changement des pages:"
 				},
 				en: {
 					add_site: "Add a website",
 					change_duration: "Change delay",
 					enter_url_site: "Enter the website URL (FULL-LENGTH URL):",
-					enter_duration: "Enter the delay between webpage switch:"
+					enter_duration: "Enter the delay (in seconds) between webpage switch:"
 				}
 			}
 
@@ -235,7 +235,7 @@
 			function changeDuration_prompt() { prompt.show(text.enter_duration, function(value) { changeDuration(value); }); }
 			function changeDuration(new_duration) {
 				if (new_duration == "" || new_duration == undefined) { return; }
-				duration = new_duration;
+				duration = new_duration * 1000;
 				startInterval();
 			}
 			
